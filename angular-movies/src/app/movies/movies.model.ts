@@ -7,13 +7,16 @@ export interface movieCreationDTO {
     inTheaters: boolean;
     releaseDate: Date;
     trailer: string;
+    genresIds: number[];
+    movieTheatersIds: number[];
 }
 
 export interface movieDTO {
     title: string;
-    summary: string;
+    summary: string | undefined;
     poster: string;
     inTheaters: boolean;
     releaseDate: Date;
     trailer: string;
+
 }

@@ -13,7 +13,7 @@ export class InputMarkdownComponent implements OnInit {
   changeMarkdown = new EventEmitter();
 
   @Input()
-  markdownContent = '';
+  markdownContent: string | undefined = '';
 
   ngOnInit(): void {
   }
