@@ -20,7 +20,7 @@
     <h4>Biography</h4>
 
     <app-input-markdown 
-    [markdownContent]="model.biography"
+    [markdownContent]="model?.biography"
     (changeMarkdown)="changeMarkdown($event)"></app-input-markdown>
     
     <div>

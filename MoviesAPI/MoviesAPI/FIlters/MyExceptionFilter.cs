@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 
-namespace MoviesAPI.FIlters
+namespace MoviesAPI.Filters
 {
     public class MyExceptionFilter : ExceptionFilterAttribute
     {

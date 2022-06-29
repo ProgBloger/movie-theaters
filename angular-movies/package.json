@@ -21,10 +21,12 @@
     "@angular/platform-browser-dynamic": "^14.0.0",
     "@angular/router": "^14.0.0",
     "@asymmetrik/ngx-leaflet": "^13.0.2",
+    "@sweetalert2/ngx-sweetalert2": "^11.0.0",
     "i": "^0.3.7",
     "leaflet": "^1.8.0",
     "ngx-markdown": "^14.0.0",
     "rxjs": "~7.5.0",
+    "sweetalert2": "^11.4.19",
     "tslib": "^2.3.0",
     "webpack": "^5.73.0",
     "zone.js": "~0.11.4"

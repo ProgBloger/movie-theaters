@@ -1,7 +1,7 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { EventEmitter } from '@angular/core';
-import { actorDTO } from '../actors.model';
+import { actorCreationDTO, actorDTO } from '../actors.model';
 
 @Component({
   selector: 'app-form-actor',
@@ -15,13 +15,10 @@ export class FormActorComponent implements OnInit {
   form: FormGroup;
 
   @Input()
-  model: actorDTO = { name: 'Tom Holland',
-    dateOfBirth: new Date(), 
-    picture: 'https://m.media-amazon.com/images/M/MV5BNzZiNTEyNTItYjNhMS00YjI2LWIwMWQtZmYwYTRlNjMyZTJjXkEyXkFqcGdeQXVyMTExNzQzMDE0._V1_UX214_CR0,0,214,317_AL_.jpg',
-    biography: 'placeholder' }
+  model: actorDTO;
 
   @Output()
-  onSaveChanges = new EventEmitter<actorDTO>();
+  onSaveChanges:EventEmitter<actorCreationDTO> = new EventEmitter<actorCreationDTO>();
 
   ngOnInit(): void {
     this.form = this.formBuilder.group({
