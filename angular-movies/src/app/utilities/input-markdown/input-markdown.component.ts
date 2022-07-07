@@ -15,6 +15,9 @@ export class InputMarkdownComponent implements OnInit {
   @Input()
   markdownContent: string | undefined = '';
 
+  @Input()
+  label = 'Value';
+
   ngOnInit(): void {
   }
 

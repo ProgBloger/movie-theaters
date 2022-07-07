@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -8,6 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using MoviesAPI.Filters;
 using MoviesAPI.Helpers;
 using MoviesAPI.Persistence;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
 
 namespace MoviesAPI
 {
@@ -23,9 +26,11 @@ namespace MoviesAPI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDbContext<ApplicationDbContext>(options => 
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection"),
+                    sqlOptions => sqlOptions.UseNetTopologySuite()));
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc(); /*options => options.Filters.Add(new ValidationFilter()));*/
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
             services.AddCors(options =>
             {
@@ -39,14 +44,27 @@ namespace MoviesAPI
                 });
             });
 
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+
             services.AddAutoMapper(typeof(Startup));
+            services.AddSingleton(provider => new MapperConfiguration(config =>
+            {
+                var geometryFactory = provider.GetRequiredService<GeometryFactory>();
+                config.AddProfile(new AutoMapperProfiles(geometryFactory));
+            }).CreateMapper());
+
+            services.AddSingleton<GeometryFactory>(NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326));
+
             services.AddScoped<IFileStorageService, InAppStorageService>();
             services.AddHttpContextAccessor();
 
             services.AddControllers(options =>
             {
                 options.Filters.Add(typeof(MyExceptionFilter));
-
+                options.Filters.Add<ValidationFilter>();
             });
         }
 

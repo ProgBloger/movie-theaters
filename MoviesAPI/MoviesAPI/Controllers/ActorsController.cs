@@ -20,6 +20,8 @@ namespace MoviesAPI.Controllers
         private readonly ApplicationDbContext context;
         private readonly IMapper mapper;
         private readonly IFileStorageService _fileStorageService;
+        public string containerName = "actors";
+
 
         public ActorsController(ApplicationDbContext context, IMapper mapper, IFileStorageService fileStorageService)
         {
@@ -51,6 +53,21 @@ namespace MoviesAPI.Controllers
             return mapper.Map<ActorDTO>(actor);
         }
 
+        [HttpPost("searchByName")]
+        public async Task<ActionResult<List<ActorsMovieDTO>>> SearchByName([FromBody]string? name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                return new List<ActorsMovieDTO>();
+            }
+
+            return await context.Actors.Where(x => x.Name.Contains(name))
+                .OrderBy(x => x.Name)
+                .Select(x => new ActorsMovieDTO() { Id = x.Id, Name = x.Name, Picture = x.Picture })
+                .Take(5)
+                .ToListAsync();
+        }
+
         [HttpPost]
         public async Task<ActionResult> Post([FromForm] ActorCreationDTO actorCreationDTO)
         {
@@ -59,7 +76,7 @@ namespace MoviesAPI.Controllers
                 return BadRequest();
             }
 
-            var picturPath = await _fileStorageService.SaveFile("actors", actorCreationDTO.Picture);
+            var picturPath = await _fileStorageService.SaveFile(containerName, actorCreationDTO.Picture);
 
             var actor = mapper.Map<Actor>(actorCreationDTO);
             actor.Picture = picturPath;
@@ -70,10 +87,28 @@ namespace MoviesAPI.Controllers
             return NoContent();
         }
 
-        [HttpPut]
-        public async Task<ActionResult> Put([FromForm] ActorCreationDTO actorCreationDTO)
+        [HttpPut("{id:int}")]
+        public async Task<ActionResult> Put(int id, [FromForm] ActorCreationDTO actorCreationDTO)
         {
-            throw new NetworkInformationException();
+            var actor = await context.Actors.FirstOrDefaultAsync(x => x.Id == id);
+
+            if (actor == null)
+            {
+                return NotFound();
+            }
+
+            actor = mapper.Map(actorCreationDTO, actor);
+
+            if (actorCreationDTO.Picture != null)
+            {
+                actor.Picture =
+                    await _fileStorageService.EditFile(containerName, actorCreationDTO.Picture, actor.Picture);
+
+            }
+
+            await context.SaveChangesAsync();
+
+            return NoContent();
         }
 
         [HttpDelete("{id:int}")]
@@ -88,6 +123,9 @@ namespace MoviesAPI.Controllers
 
             context.Remove(actor);
             await context.SaveChangesAsync();
+
+            await _fileStorageService.DeleteFile(actor.Picture, containerName);
+
 
             return NoContent();
         }

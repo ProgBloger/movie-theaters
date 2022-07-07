@@ -18,7 +18,7 @@ export class EditActorComponent implements OnInit {
   model: actorDTO;
   
   ngOnInit(): void {
-    this.activatedRoute.params.subscribe(params => {
+      this.activatedRoute.params.subscribe(params => {
       this.actorsService.getById(params['id']).subscribe(actor => this.model = actor);  
     });
   }

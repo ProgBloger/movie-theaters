@@ -1,4 +1,6 @@
+import { HttpResponse } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
+import { PageEvent } from '@angular/material/paginator';
 import { throwToolbarMixedModesError } from '@angular/material/toolbar';
 import { actorDTO } from '../actors.model';
 import { ActorsService } from '../actors.service';
@@ -14,15 +16,31 @@ export class IndexActorsComponent implements OnInit {
 
   actors: actorDTO[];
   columnsToDisplay = ['name', 'actions'];
+  totalAmountOfRecords;
+  currentPage = 1;
+  pageSize = 5;
   
   ngOnInit(): void {
-    this.actorsService.get().subscribe((actors: actorDTO[]) => {
-      this.actors = actors;
+    this.loadData();
+  }
+
+  loadData() {
+    this.actorsService.get(this.currentPage, this.pageSize).subscribe((response: HttpResponse<actorDTO[]>) => {
+      this.actors = response.body as actorDTO[];
+      this.totalAmountOfRecords = response.headers.get("totalAmountOfRecords");
     });
   }
 
-  delete(id: BigInteger){
+  updatePagination(event: PageEvent) {
+    this.currentPage = event.pageIndex + 1;
+    this.pageSize = event.pageSize;
+    this.loadData();
+  }
 
+  delete(id: number){
+      this.actorsService.delete(id).subscribe(() => {
+      this.loadData();
+    })
   }
 
 }

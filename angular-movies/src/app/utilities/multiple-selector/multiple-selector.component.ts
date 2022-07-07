@@ -18,6 +18,7 @@ export class MultipleSelectorComponent implements OnInit {
   NonSelectedItems: multipleSelectorModel[] = [];
 
   ngOnInit(): void {
+    console.log(this.NonSelectedItems);
   }
 
   select(item: multipleSelectorModel, index: number){
